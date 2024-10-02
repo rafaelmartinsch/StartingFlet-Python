@@ -1,85 +1,59 @@
-#O formulário coleta várias informações do usuário, como dados pessoais, preferências de viagem, opções de transporte, interesses em atividades ao ar livre e um campo para notas adicionais.
-
-
 import flet as ft
 
 def main(page: ft.Page):
-    # Função para coletar os dados e exibir no console
-    def submit_data(e):
-        selected_topics = []
-        for checkbox in topics_checkboxes:
-            if checkbox.value:
-                selected_topics.append(checkbox.label)
+
+    # Função para validar os dados do formulário
+    def validate_form(e):
+        name = name_field.value
+        age = age_field.value
+        email = email_field.value
+        error_message = ""
+
+        # Validações
+        if not name:
+            error_message += "Name cannot be empty.\n"
         
-        print(f"Nome do Evento: {event_name.value}")
-        print(f"Data do Evento: {event_date.value}")
-        print(f"Localização: {location.value}")
-        print(f"Público-alvo: {audience_options.value}")
-        print(f"Tópicos Abordados: {', '.join(selected_topics)}")
-        print(f"Preferência Alimentar: {food_preferences.value}")
-        print(f"Duração Estimada: {duration_slider.value} horas")
-        print(f"Descrição Adicional: {description_field.value}")
+        if not age.isdigit() or int(age) <= 0:
+            error_message += "Age must be a number greater than 0.\n"
+        
+        if "@" not in email or "." not in email:
+            error_message += "Email must be valid and contain '@' and '.'.\n"
+        
+        # Exibe mensagens de erro ou sucesso
+        if error_message:
+            result_text.value = error_message
+            result_text.color = ft.colors.RED
+        else:
+            result_text.value = "Form submitted successfully!"
+            result_text.color = ft.colors.GREEN
+
+        page.update()
 
     # Campos do formulário
-    event_name = ft.TextField(label="Nome do Evento", hint_text="Digite o nome do evento")
-    event_date = ft.TextField(label="Data do Evento", hint_text="Ex: 15/10/2024")
-    location = ft.TextField(label="Localização", hint_text="Digite o endereço do evento")
+    name_field = ft.TextField(label="Name", hint_text="Enter your name")
+    age_field = ft.TextField(label="Age", hint_text="Enter your age", keyboard_type=ft.KeyboardType.NUMBER)
+    email_field = ft.TextField(label="Email", hint_text="Enter your email")
 
-    audience_options = ft.Dropdown(
-        label="Público-alvo",
-        options=[
-            ft.dropdown.Option("Estudantes"),
-            ft.dropdown.Option("Profissionais da área"),
-            ft.dropdown.Option("Startups"),
-            ft.dropdown.Option("Empresários"),
-            ft.dropdown.Option("Pesquisadores"),
-        ]
-    )
+    # Botão para submissão
+    submit_button = ft.ElevatedButton(text="Submit", on_click=validate_form)
 
-    # Adicionando Checkboxes individualmente
-    topics_checkboxes = [
-        ft.Checkbox(label="Inteligência Artificial", value=False),
-        ft.Checkbox(label="Big Data", value=False),
-        ft.Checkbox(label="Internet das Coisas", value=False),
-        ft.Checkbox(label="Blockchain", value=False),
-        ft.Checkbox(label="Robótica", value=False)
-    ]
-    
-    food_preferences = ft.Dropdown(
-        label="Preferência Alimentar",
-        options=[
-            ft.dropdown.Option("Nenhuma"),
-            ft.dropdown.Option("Vegetariana"),
-            ft.dropdown.Option("Vegana"),
-            ft.dropdown.Option("Sem Glúten"),
-            ft.dropdown.Option("Sem Lactose"),
-        ]
-    )
+    # Texto de resultado
+    result_text = ft.Text(value="", color=ft.colors.RED)
 
-    duration_slider = ft.Slider(min=1, max=12, divisions=11, label="{value} horas", value=4)
-    description_field = ft.TextField(
-        label="Descrição Adicional", hint_text="Descreva detalhes adicionais sobre o evento", multiline=True
-    )
-
-
-    # Botão de envio
-    submit_button = ft.ElevatedButton(text="Enviar", on_click=submit_data)
-
-    # Layout da página
+    # Adicionando componentes à página
     page.add(
-        ft.Text("Cadastro de Evento de Inovação"),
-        event_name,
-        event_date,
-        location,
-        audience_options,
-        ft.Text("Tópicos Abordados:"),
-        *topics_checkboxes,  # Desenha os checkboxes um por um
-        food_preferences,
-        ft.Text("Duração do Evento (em horas):"),
-        duration_slider,
-        description_field,
-        submit_button
+        ft.Column(
+            [
+                name_field,
+                age_field,
+                email_field,
+                submit_button,
+                result_text,
+            ],
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        )
     )
 
-# Executar o app
+# Executa o app
 ft.app(target=main)
