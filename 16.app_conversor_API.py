@@ -3,6 +3,7 @@ import requests
 
 
 def main(page: ft.Page):
+    page.window_width=600
     
     
     def get_dolar(moeda):
